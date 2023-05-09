@@ -4,9 +4,9 @@
 #include <iostream>
 
 #define P1
-#define P2
-#define P3
-#define P4
+//#define P2
+//#define P3
+//#define P4
 
 #include "Stack.h"
 

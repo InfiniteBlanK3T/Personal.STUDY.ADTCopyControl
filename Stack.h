@@ -26,7 +26,7 @@ public:
     
 #ifdef P1
 	
-    Stack(); :
+    Stack();
     ~Stack();
 
 #endif
