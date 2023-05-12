@@ -20,13 +20,17 @@ private:
     {
         assert(fStackPointer <= aNewSize);
 
-        T* lNewElment = newT[aNewSize];
+        T* lNewElements = new T[aNewSize];
 
         for (size_t i = 0; i < fStackPointer; i++)
         {
-            fElements[i] = lNewElment.fElements[i];
+            lNewElements[i] = std::move(fElements[i]);
         }
 
+        delete[] fElements;
+
+        fElements = lNewElements;
+        fCurrentSize = aNewSize;
     }
     void ensure_capacity()
     {
@@ -37,7 +41,7 @@ private:
     }
     void adjust_capacity()
     {
-        if (fStackPointer == fCurrentSize / 4)
+        if (fStackPointer <= fCurrentSize / 4)
         {
             return resize(fCurrentSize / 2);
         }
@@ -50,9 +54,9 @@ public:
 #ifdef P1
 	
     Stack() :
-        fElements(new T[fCurrentSize]),
+        fElements(new T[1]),
         fStackPointer(),
-        fCurrentSize(1),
+        fCurrentSize(1)
     {}
 
     ~Stack()
@@ -64,9 +68,15 @@ public:
 
 #ifdef P3
 	
-    Stack( const Stack& aOther ); 
+    Stack( const Stack& aOther )
+    {
+
+    }
     
-    Stack& operator=( const Stack<T>& aOther );
+    Stack& operator=(const Stack<T>& aOther)
+    {
+
+    }
 
 #endif
 
@@ -93,23 +103,32 @@ public:
         {
             return std::optional<T>(fElements[fStackPointer - 1]);
         }
-        return std::optional<T>();       
+        else
+        {
+            return std::optional<T>();
+        }
+        
     }
 
     void push(const T& aValue)
     {
-
         ensure_capacity();
 
-        return fElements[fStackPointer++] = aValue;
-
+        fElements[fStackPointer++] = aValue;
     }
 #endif
 	
 #ifdef P2
 	
     template<typename... Args>
-    void emplace(Args&&... args);
+    void emplace(Args&&... args)
+    {
+        ensure_capacity();
+
+        fElements[fStackPointer].~T();
+
+        new (&fElements[fStackPointer++]) T(std::forward<Args>(args)...);
+    }
 
 #endif
 
