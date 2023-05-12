@@ -9,12 +9,10 @@
 template<typename T>
 class Stack
 {
-private:
+    private:
     T* fElements;
     size_t fStackPointer;
     size_t fCurrentSize;
-
-#ifdef P1
 	    
     void resize( size_t aNewSize )
     {
@@ -46,12 +44,8 @@ private:
             return resize(fCurrentSize / 2);
         }
     }
-
-#endif
     
-public:
-    
-#ifdef P1
+    public:    
 	
     Stack() :
         fElements(new T[1]),
@@ -64,23 +58,32 @@ public:
         delete[] fElements;
     }
 
-#endif
 
-#ifdef P3
-	
-    Stack( const Stack& aOther )
+    Stack( const Stack& aOther ):
+        fElements(new T[aOther.fCurrentSize]),
+        fStackPointer(aOther.fStackPointer),
+        fCurrentSize(aOther.fCurrentSize)
     {
+        assert(fStackPointer <= fCurrentSize);
 
+        for (size_t i = 0; i < fStackPointer; i++)
+        {
+            fElements[i] = aOther.fElements[i];
+        }
     }
     
     Stack& operator=(const Stack<T>& aOther)
     {
+        if (this != &aOther)
+        {
+            this->~Stack();
 
+            new(this) Stack(aOther);
+        }
+        return *this;
     }
 
-#endif
-
-#ifdef P4
+    #ifdef P4
 
     Stack( Stack<T>&& aOther ) noexcept;
     
@@ -88,10 +91,8 @@ public:
 
     void swap( Stack& aOther ) noexcept;
 
-#endif
+    #endif
       
-#ifdef P1
-	  
     size_t size() const noexcept
     {
         return fStackPointer;
@@ -116,9 +117,6 @@ public:
 
         fElements[fStackPointer++] = aValue;
     }
-#endif
-	
-#ifdef P2
 	
     template<typename... Args>
     void emplace(Args&&... args)
@@ -129,10 +127,6 @@ public:
 
         new (&fElements[fStackPointer++]) T(std::forward<Args>(args)...);
     }
-
-#endif
-
-#ifdef P1
 	
     void pop()
     {
@@ -142,6 +136,4 @@ public:
 
         adjust_capacity();
     }
-	
-#endif
 };
