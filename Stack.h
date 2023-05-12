@@ -83,15 +83,27 @@ class Stack
         return *this;
     }
 
-    #ifdef P4
-
-    Stack( Stack<T>&& aOther ) noexcept;
+    Stack(Stack<T>&& aOther) noexcept:
+        Stack()
+    {
+        swap(aOther);
+    }
     
-    Stack& operator=( Stack<T>&& aOther ) noexcept;
+    Stack& operator=(Stack<T>&& aOther) noexcept
+    {
+        if (this != &aOther)
+        {
+            swap(aOther);
+        }
+        return *this;
+    }
 
-    void swap( Stack& aOther ) noexcept;
-
-    #endif
+    void swap(Stack& aOther) noexcept
+    {
+        std::swap(fElements, aOther.fElements);
+        std::swap(fStackPointer, aOther.fStackPointer);
+        std::swap(fCurrentSize, aOther.fCurrentSize);
+    }
       
     size_t size() const noexcept
     {
