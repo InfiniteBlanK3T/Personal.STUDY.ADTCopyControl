@@ -16,9 +16,32 @@ private:
 
 #ifdef P1
 	    
-    void resize( size_t aNewSize );
-    void ensure_capacity();
-    void adjust_capacity();
+    void resize( size_t aNewSize )
+    {
+        assert(fStackPointer <= aNewSize);
+
+        T* lNewElment = newT[aNewSize];
+
+        for (size_t i = 0; i < fStackPointer; i++)
+        {
+            fElements[i] = lNewElment.fElements[i];
+        }
+
+    }
+    void ensure_capacity()
+    {
+        if (fStackPointer == fCurrentSize)
+        {
+            return resize(fCurrentSize * 2);
+        }
+    }
+    void adjust_capacity()
+    {
+        if (fStackPointer == fCurrentSize / 4)
+        {
+            return resize(fCurrentSize / 2);
+        }
+    }
 
 #endif
     
@@ -26,8 +49,16 @@ public:
     
 #ifdef P1
 	
-    Stack();
-    ~Stack();
+    Stack() :
+        fElements(new T[fCurrentSize]),
+        fStackPointer(),
+        fCurrentSize(1),
+    {}
+
+    ~Stack()
+    {
+        delete[] fElements;
+    }
 
 #endif
 
@@ -51,12 +82,28 @@ public:
       
 #ifdef P1
 	  
-    size_t size() const noexcept;
+    size_t size() const noexcept
+    {
+        return fStackPointer;
+    }
     
-    std::optional<T> top() noexcept;
+    std::optional<T> top() noexcept
+    {
+        if (fStackPointer > 0)
+        {
+            return std::optional<T>(fElements[fStackPointer - 1]);
+        }
+        return std::optional<T>();       
+    }
 
-    void push( const T& aValue );
+    void push(const T& aValue)
+    {
 
+        ensure_capacity();
+
+        return fElements[fStackPointer++] = aValue;
+
+    }
 #endif
 	
 #ifdef P2
@@ -68,7 +115,14 @@ public:
 
 #ifdef P1
 	
-    void pop();
+    void pop()
+    {
+        assert(fStackPointer > 0);
+
+        fStackPointer--;
+
+        adjust_capacity();
+    }
 	
 #endif
 };
